@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Scheduler</title>
+  <style>
+    :root {
+      --primary-color: #4caf50;
+      --secondary-color: #2e7d32;
+      --background-color: #f0f2f5;
+      --text-color: #333;
+      --card-color: #ffffff;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--background-color);
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: var(--card-color);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: var(--primary-color);
+      margin-bottom: 30px;
+    }
+
+    label {
+      font-weight: bold;
+      color: var(--text-color);
+    }
+
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0 20px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    input:focus, button:hover {
+      outline: none;
+      border-color: var(--primary-color);
+    }
+
+    button {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: var(--secondary-color);
+    }
+
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+    }
+
+    .day {
+      background: #e0e0e0;
+      padding: 15px;
+      text-align: center;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.2s;
+    }
+
+    .day:hover {
+      background: #d5d5d5;
+    }
+
+    .day.active {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .reminder {
+      background: #e8f5e9;
+      border-left: 5px solid var(--primary-color);
+      padding: 15px;
+      margin-top: 15px;
+      border-radius: 8px;
+      color: #2e7d32;
+    }
+
+    .credits {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 14px;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📅 English Work</h1>
+    <h1>📅 Payment Scheduler</h1>
+
+    <label for="descricao">💡 Accont Type:</label>
+    <input type="text" id="descricao" placeholder="e.g. Electricity, Internet...">
+
+    <label for="empresa">🏢 Company:</label>
+    <input type="text" id="empresa" placeholder="e.g. Netflix, PowerCo, ISP...">
+
+    <label for="dia">🗓️ Select a day:</label>
+    <div class="calendar" id="calendario"></div>
+
+    <button onclick="agendarLembrete()">✅ Schedule Payment</button>
+
+    <div id="lembretes"></div>
+    <div class="credits">
+      <p>Created by Natan Lemos, Luise Vieira, Guilherme Siqueira, and Vanessa Corrêa</p>
+    </div>
+  </div>
+
+  <script>
+    const calendario = document.getElementById("calendario");
+    const lembretes = document.getElementById("lembretes");
+    let selectedDay = null;
+
+    // Generate days of the month
+    for (let i = 1; i <= 30; i++) {
+      const div = document.createElement("div");
+      div.classList.add("day");
+      div.textContent = i;
+      div.onclick = () => selectDay(div, i);
+      calendario.appendChild(div);
+    }
+
+    function selectDay(element, day) {
+      document.querySelectorAll(".day").forEach(d => d.classList.remove("active"));
+      element.classList.add("active");
+      selectedDay = day;
+    }
+
+    function agendarLembrete() {
+      const description = document.getElementById("descricao").value;
+      const company = document.getElementById("empresa").value;
+      if (!description || !company || !selectedDay) {
+        alert("Please fill in all fields and select a day.");
+        return;
+      }
+      const msg = `📌 Day ${selectedDay}: ${description} - ${company}`;
+      const div = document.createElement("div");
+      div.classList.add("reminder");
+      div.textContent = msg;
+      lembretes.appendChild(div);
+
+      document.getElementById("descricao").value = "";
+      document.getElementById("empresa").value = "";
+      document.querySelectorAll(".day").forEach(d => d.classList.remove("active"));
+      selectedDay = null;
+    }
+  </script>
+</body>
+</html>
