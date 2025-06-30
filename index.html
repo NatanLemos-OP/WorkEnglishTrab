@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Payment Scheduler</title>
   <style>
     :root {
@@ -32,7 +32,7 @@
     h1 {
       text-align: center;
       color: var(--primary-color);
-      margin-bottom: 30px;
+      margin-bottom: 20px;
     }
 
     label {
@@ -101,6 +101,64 @@
       color: #2e7d32;
     }
 
+    .generate-btn {
+      margin-top: 10px;
+      width: 100%;
+      background: #2196f3;
+      padding: 10px;
+      font-size: 14px;
+      border-radius: 6px;
+    }
+
+    .generate-btn:hover {
+      background: #1769aa;
+    }
+
+    .invoice {
+      background: #fff;
+      border: 2px dashed #999;
+      padding: 20px;
+      margin-top: 20px;
+      border-radius: 10px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 14px;
+      color: #000;
+    }
+
+    .invoice h3 {
+      text-align: center;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+
+    .invoice table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 10px;
+    }
+
+    .invoice table td {
+      padding: 5px;
+      border-bottom: 1px dashed #ccc;
+    }
+
+    .invoice .print-btn {
+      width: 100%;
+      background: #ff9800;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 6px;
+      color: white;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+    }
+
+    .invoice .print-btn:hover {
+      background: #e68900;
+    }
+
     .credits {
       text-align: center;
       margin-top: 40px;
@@ -114,7 +172,7 @@
     <h1>📅 English Work</h1>
     <h1>📅 Payment Scheduler</h1>
 
-    <label for="descricao">💡 Accont Type:</label>
+    <label for="descricao">💡 Account Type:</label>
     <input type="text" id="descricao" placeholder="e.g. Electricity, Internet...">
 
     <label for="empresa">🏢 Company:</label>
@@ -136,7 +194,6 @@
     const lembretes = document.getElementById("lembretes");
     let selectedDay = null;
 
-    // Generate days of the month
     for (let i = 1; i <= 30; i++) {
       const div = document.createElement("div");
       div.classList.add("day");
@@ -154,20 +211,82 @@
     function agendarLembrete() {
       const description = document.getElementById("descricao").value;
       const company = document.getElementById("empresa").value;
+
       if (!description || !company || !selectedDay) {
         alert("Please fill in all fields and select a day.");
         return;
       }
+
       const msg = `📌 Day ${selectedDay}: ${description} - ${company}`;
       const div = document.createElement("div");
       div.classList.add("reminder");
       div.textContent = msg;
+
+      const btn = document.createElement("button");
+      btn.classList.add("generate-btn");
+      btn.textContent = "💸 Paid / Generate Invoice";
+      btn.onclick = () => gerarNotaFiscal(div, description, company, selectedDay);
+      div.appendChild(btn);
+
       lembretes.appendChild(div);
 
       document.getElementById("descricao").value = "";
       document.getElementById("empresa").value = "";
       document.querySelectorAll(".day").forEach(d => d.classList.remove("active"));
       selectedDay = null;
+    }
+
+    function gerarNotaFiscal(parent, descricao, empresa, dia) {
+      let valor = prompt("Digite o valor pago (ex: 120.50):");
+      if (!valor || isNaN(parseFloat(valor))) {
+        alert("Valor inválido!");
+        return;
+      }
+
+      valor = parseFloat(valor).toFixed(2);
+      const dataHoje = new Date().toLocaleDateString();
+      const numero = Math.floor(Math.random() * 900000 + 100000);
+
+      const nota = document.createElement("div");
+      nota.classList.add("invoice");
+      nota.innerHTML = `
+        <h3>🧾 NOTA FISCAL</h3>
+        <table>
+          <tr><td><strong>Nº:</strong> NF-${numero}</td><td><strong>Data:</strong> ${dataHoje}</td></tr>
+          <tr><td><strong>Cliente:</strong> Natan Lemos</td><td><strong>Dia:</strong> ${dia}</td></tr>
+          <tr><td colspan="2"><strong>Empresa:</strong> ${empresa}</td></tr>
+          <tr><td colspan="2"><strong>Serviço:</strong> ${descricao}</td></tr>
+          <tr><td colspan="2"><strong>Total Pago:</strong> R$ ${valor}</td></tr>
+        </table>
+        <p style="text-align:center;">Este documento é apenas uma simulação<br>Não possui valor fiscal oficial</p>
+      `;
+
+      const btnPrint = document.createElement("button");
+      btnPrint.classList.add("print-btn");
+      btnPrint.textContent = "🖨️ Imprimir Nota";
+      btnPrint.onclick = () => imprimirElemento(nota);
+
+      nota.appendChild(btnPrint);
+      parent.appendChild(nota);
+    }
+
+    function imprimirElemento(el) {
+      const win = window.open("", "PRINT", "height=600,width=800");
+      win.document.write(`
+        <html>
+        <head>
+          <title>Nota Fiscal</title>
+          <style>
+            body { font-family: 'Courier New'; padding: 20px; }
+            .invoice { border: 2px dashed #999; padding: 20px; }
+          </style>
+        </head>
+        <body>${el.innerHTML}</body>
+        </html>`);
+      win.document.close();
+      win.focus();
+      win.print();
+      win.close();
     }
   </script>
 </body>
